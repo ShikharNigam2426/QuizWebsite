@@ -23,18 +23,18 @@ const SignUp = () => {
 const SignupContainer = styled.div`
     height: 100vh;
     width: 100%;
-    background-color: #121212; /* Deep black background */
+    background-color: #121212;
     display: flex;
     justify-content: center;
     align-items: center;
 `;
 
 const SignupBox = styled.div`
-    background-color: #1e1e1e; /* Slightly lighter black for contrast */
+    background-color: #1e1e1e;
     color: #ffffff;
     padding: 2rem;
     border-radius: 10px;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
     text-align: center;
     max-width: 400px;
     width: 100%;
@@ -43,7 +43,7 @@ const SignupBox = styled.div`
 const Input = styled.input`
     background-color: #292929;
     color: #fff;
-    border: 1px solid #444; /* Border for inputs */
+    border: 1px solid #444;
     padding: 10px;
     margin: 10px 0;
     width: 100%;
@@ -52,7 +52,7 @@ const Input = styled.input`
 
     &:focus {
         outline: none;
-        border-color: #007bff; /* Bootstrap-like primary color */
+        border-color: #007bff; 
         box-shadow: 0 0 5px #007bff;
     }
 `;

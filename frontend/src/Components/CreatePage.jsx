@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 
 const CreatePage = () => {
+  // all the data of the question while filing the right side is stored here locally
   const [formData, setFormData] = useState({
     question: '',
     option1: '',
@@ -14,6 +16,12 @@ const CreatePage = () => {
   const [questions, setQuestions] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
 
+  // Generating a 6-digit random code
+  const generateCode = () => {
+    return Math.floor(100000 + Math.random() * 900000);
+  };
+
+  // adding the question to the questions array
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -22,6 +30,7 @@ const CreatePage = () => {
     });
   };
 
+  // updating the question in the questions array while editing
   const handleSubmit = (e) => {
     e.preventDefault();
     if (editingIndex !== null) {
@@ -42,6 +51,7 @@ const CreatePage = () => {
     });
   };
 
+  // remove the question from the questions Array
   const handleDelete = (index) => {
     const updatedQuestions = questions.filter((_, i) => i !== index);
     setQuestions(updatedQuestions);
@@ -52,6 +62,31 @@ const CreatePage = () => {
     setFormData(questionToEdit);
     setEditingIndex(index);
   };
+
+  // Handle 'Create Quiz' button click to send data with code
+  const handleCreateQuiz = async () => {
+    const code = generateCode();
+    const quizData = {
+      code: code,
+      questions: questions.map((q, index) => ({
+        id: index + 1,
+        question: q.question,
+        options: [q.option1, q.option2, q.option3, q.option4],
+        correctAnswer: q.correctAnswer,
+      })),
+    };
+  
+    try {
+      console.log(quizData);
+      const response = await axios.post('http://localhost:3003/createquiz', quizData);
+      console.log(response.data);  // For testing purposes, logging the response from the server
+      alert('Quiz created successfully! Code is: ' + quizData.code);
+    } catch (error) {
+      console.error('Error creating quiz:', error);
+      alert('Error creating quiz. Please try again.');
+    }
+  };
+  
 
   return (
     <PageContainer>
@@ -84,7 +119,7 @@ const CreatePage = () => {
               <p>No questions created yet.</p>
             )}
           </ScrollableQuestions>
-          {questions.length > 0 && <CreateQuizButton>Create Quiz</CreateQuizButton>}
+          {questions.length > 0 && <CreateQuizButton onClick={handleCreateQuiz}>Create Quiz</CreateQuizButton>}
         </QuestionsList>
         <FormContainer>
           <h2>{editingIndex !== null ? 'Edit Question' : 'Create New Question'}</h2>
@@ -159,10 +194,10 @@ const CreatePage = () => {
                 required
               >
                 <option value="">Select the correct answer</option>
-                <option value="option1">Option 1</option>
-                <option value="option2">Option 2</option>
-                <option value="option3">Option 3</option>
-                <option value="option4">Option 4</option>
+                <option value={formData.option1}>{formData.option1}</option>
+                <option value={formData.option2}>{formData.option2}</option>
+                <option value={formData.option3}>{formData.option3}</option>
+                <option value={formData.option4}>{formData.option4}</option>
               </select>
             </InputField>
             <ButtonContainer>

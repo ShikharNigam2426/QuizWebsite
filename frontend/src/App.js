@@ -6,6 +6,7 @@ import Login from './Components/Login';
 import Landing from './Components/Landing';
 import Navbar from './Components/Navbar';
 import CreatePage from './Components/CreatePage';
+import TakeQuiz from './Components/TakeQuiz';
 
 const App = () => {
   return (
@@ -24,6 +25,12 @@ const App = () => {
             <>
               <Navbar />
               <CreatePage />
+            </>
+          } />
+          <Route path="/takeQuiz/:code" element={
+            <>
+              <Navbar />
+              <TakeQuiz />
             </>
           } />
         </Routes>

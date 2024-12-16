@@ -1,8 +1,31 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import styled from 'styled-components';
 
 const Landing = () => {
+  const [quizCode, setQuizCode] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleJoinQuiz = async () => {
+    try {
+      // Making a GET request to check if the quiz code exists
+      const response = await axios.get(`http://localhost:3003/quiz/${quizCode}`);
+
+      if (response.data.exists) {
+        // Redirecting to `/takeQuiz/:code` if the quiz exists
+        alert('The quiz will start as you Press Enter or click on OK button down here.')
+        navigate(`/takeQuiz/${quizCode}`);
+      } else {
+        setError('Quiz code not found. Please check and try again.');
+      }
+    } catch (error) {
+      console.error('Error verifying quiz code:', error);
+      setError('An error occurred. Please try again later.');
+    }
+  };
+
   return (
     <LandingComponent>
       <Content>
@@ -39,9 +62,15 @@ const Landing = () => {
               Have a quiz code? Enter it below to join the fun!
             </Description>
             <JoinQuizSection>
-              <InputField type="text" placeholder="Enter Quiz Code" />
-              <JoinButton>Join</JoinButton>
+              <InputField
+                type="text"
+                placeholder="Enter Quiz Code"
+                value={quizCode}
+                onChange={(e) => setQuizCode(e.target.value)}
+              />
+              <JoinButton onClick={handleJoinQuiz}>Join</JoinButton>
             </JoinQuizSection>
+            {error && <ErrorMessage>{error}</ErrorMessage>}
           </Section>
         </RightSection>
       </Content>
@@ -50,6 +79,14 @@ const Landing = () => {
 };
 
 export default Landing;
+
+const ErrorMessage = styled.p`
+  color: red;
+  font-size: 1rem;
+  margin-top: 10px;
+  font-family: 'Poppins', sans-serif;
+`;
+
 
 const LandingComponent = styled.div`
   width: 100%;
