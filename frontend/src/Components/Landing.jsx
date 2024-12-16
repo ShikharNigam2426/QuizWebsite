@@ -1,11 +1,11 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Landing = () => {
   return (
     <LandingComponent>
       <Content>
-        {/* Left Section */}
         <LeftSection>
           <MainTitle>
             Welcome to <span>Quiz.io</span>
@@ -20,14 +20,17 @@ const Landing = () => {
           </FeaturesList>
         </LeftSection>
 
-        {/* Right Section */}
         <RightSection>
           <Section>
             <SectionHeading>Create Your Own Quiz</SectionHeading>
             <Description>
               Craft custom quizzes to challenge your friends or audience.
             </Description>
-            <CreateQuizButton>Create a Quiz</CreateQuizButton>
+            <Link to='/createQuiz'>
+              <CreateQuizButton className='btn btn-outline-primary'>
+                Create a Quiz
+              </CreateQuizButton>
+            </Link>
           </Section>
 
           <Section>
@@ -48,14 +51,12 @@ const Landing = () => {
 
 export default Landing;
 
-// Styled Components
 const LandingComponent = styled.div`
   width: 100%;
   height: 100vh;
-  background: #000000; /* Deep black background */
+  background: #000000;
   display: flex;
   justify-content: center;
-  align-items: center;
   padding: 20px;
 `;
 
@@ -63,7 +64,8 @@ const Content = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  height: 70vh;
   width: 90%;
   max-width: 1200px;
 `;
@@ -90,8 +92,13 @@ const MainTitle = styled.h1`
   margin-bottom: 10px;
   color: #ffffff;
   font-family: 'Poppins', sans-serif;
+
   span {
-    color: #4dabf7; /* Blue highlight */
+    color: #4dabf7;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
   }
 `;
 
@@ -100,6 +107,10 @@ const Subtitle = styled.p`
   margin-bottom: 20px;
   color: #a0a0ff;
   font-family: 'Poppins', sans-serif;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
 `;
 
 const FeaturesList = styled.ul`
@@ -114,55 +125,71 @@ const FeaturesList = styled.ul`
     display: flex;
     align-items: center;
     gap: 8px;
+
     &:before {
-      content: "✓"; /* Checkmark icon */
+      content: "✓";
       color: #4dabf7;
     }
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
   }
 `;
 
 const Section = styled.div`
-  background: rgba(10, 20, 40, 0.9); /* Deep blue semi-transparent background */
+  background: rgba(10, 20, 40, 0.9);
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 8px 30px rgba(0, 0, 255, 0.4);
   transition: transform 0.3s ease, box-shadow 0.3s ease, z-index 0.3s ease;
-  position: relative; /* This is required for z-index to work */
+  position: relative;
 
   &:hover {
-    transform: translateY(-10px); /* Rise up */
-    box-shadow: 0 12px 50px rgba(0, 128, 255, 0.8); /* Blue glow */
-    z-index: 10; /* Increase z-index to make it appear above other elements */
+    transform: translateY(-10px);
+    box-shadow: 0 12px 50px rgba(0, 128, 255, 0.8);
+    z-index: 10;
   }
 `;
-
 
 const SectionHeading = styled.h2`
   font-size: 1.8rem;
   margin-bottom: 10px;
   color: #4dabf7;
   font-family: 'Poppins', sans-serif;
+
+  @media (max-width: 768px) {
+    font-size: 1.4rem;
+  }
 `;
 
 const Description = styled.p`
   font-size: 1rem;
   margin-bottom: 20px;
   color: #d0d0ff;
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
 `;
 
 const CreateQuizButton = styled.button`
-  background: #4dabf7; /* Blue button */
-  color: #fff;
-  border: none;
+  background: transparent;
+  color: #4dabf7;
+  border: 2px solid #4dabf7;
   border-radius: 8px;
-  padding: 12px 20px;
-  font-size: 1.2rem;
-  font-family: 'Poppins', sans-serif;
+  padding: 10px 20px;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
 
   &:hover {
-    background: #1a73e8; /* Slightly darker blue on hover */
+    background: #4dabf7;
+    color: #ffffff;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
   }
 `;
 
@@ -175,16 +202,20 @@ const JoinQuizSection = styled.div`
 const InputField = styled.input`
   flex: 1;
   max-width: 200px;
+  background: transparent;
   padding: 10px;
   border: 2px solid #4dabf7;
   border-radius: 8px;
   font-size: 1rem;
   outline: none;
   color: #ffffff;
-  background: #111111;
 
   &::placeholder {
     color: #777;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
   }
 `;
 
@@ -201,5 +232,9 @@ const JoinButton = styled.button`
   &:hover {
     background: #4dabf7;
     color: #ffffff;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
   }
 `;
