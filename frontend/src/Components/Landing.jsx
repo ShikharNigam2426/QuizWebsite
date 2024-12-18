@@ -31,7 +31,7 @@ const Landing = () => {
       <Content>
         <LeftSection>
           <MainTitle>
-            Welcome to <span>Quiz.io</span>
+            Welcome to <span>BrainRush.io</span>
           </MainTitle>
           <Subtitle>
             The ultimate platform to create, share, and compete in quizzes!

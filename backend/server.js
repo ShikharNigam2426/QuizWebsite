@@ -1,15 +1,20 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import Quiz from './Models/Quiz.js';
-import { log } from 'console';
+import bcrypt from 'bcryptjs';
+import nodemailer from 'nodemailer';
 import cors from 'cors';
+import dotenv from 'dotenv';
+import Quiz from './Models/Quiz.js';
 
+dotenv.config();
 
 const app = express();
 const port = 3003;
-app.use(cors());
 
-// MongoDB connection using await
+app.use(cors());
+app.use(express.json());
+
+// MongoDB connection
 const connectDB = async () => {
   try {
     await mongoose.connect('mongodb://localhost:27017/quizDB', {
@@ -25,32 +30,123 @@ const connectDB = async () => {
 
 connectDB();
 
-app.use(express.json());
+// User Schema and Model
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  otp: { type: String },
+});
+
+const User = mongoose.model('User', userSchema);
+
+// Register User Route
+app.post('/register', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({
+      email,
+      password: hashedPassword,
+    });
+    await user.save();
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(500).json({ error: 'Error registering user' });
+  }
+});
+
+// Login Route (sending OTP)
+app.post('/login', async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found. Redirecting to signup' });
+    }
+
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Store OTP in the database
+    user.otp = otp;
+    await user.save();
+
+    // Send OTP via email
+    sendOTPEmail(email, otp);
+
+    res.status(200).json({ message: 'OTP sent to email' });
+  } catch (error) {
+    console.error('Error logging in:', error);
+    res.status(500).json({ error: 'Error logging in' });
+  }
+});
+
+// Verify OTP Route
+app.post('/verify-otp', async (req, res) => {
+  const { email, otp } = req.body;
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if OTP matches
+    if (user.otp === otp) {
+      res.status(200).json({ message: 'OTP verified successfully' });
+    } else {
+      res.status(400).json({ message: 'Invalid OTP' });
+    }
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    res.status(500).json({ error: 'Error verifying OTP' });
+  }
+});
+
+// Send OTP Email
+const sendOTPEmail = (email, otp) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Your OTP Code',
+    text: `Your OTP code is ${otp}.`,
+  };
+
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.log('Error sending email:', err);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
+};
+
+// Quiz Routes
 
 // Create Quiz with Questions
 app.post('/createquiz', async (req, res) => {
-  console.log(req.body);
+  const { code, questions } = req.body;
   try {
-    const { code, questions } = req.body;
-    console.log('Received data:', { code, questions }); 
-    const quizCode = code;
-
-    // Create a new Quiz document
     const quiz = new Quiz({
-      code: quizCode,
-      questions: questions, // Directly adding questions array
+      code: code,
+      questions: questions,
     });
-
-    // Save the quiz
     await quiz.save();
-    console.log('Quiz saved:', quiz);  // Logging after saving
-
     res.status(201).json({
       message: 'Quiz created successfully',
       quiz,
     });
   } catch (error) {
-    console.error('Error creating quiz:', error.message);  // Logging error message
+    console.error('Error creating quiz:', error.message);
     res.status(500).json({
       message: 'Error creating quiz',
       error: error.message,
@@ -58,12 +154,11 @@ app.post('/createquiz', async (req, res) => {
   }
 });
 
-// I am verifying the quiz code here, which is being called when clicking on the join button from the landing page.
+// Verify Quiz Code
 app.get('/quiz/:code', async (req, res) => {
   const quizCode = req.params.code;
   try {
     const quiz = await Quiz.findOne({ code: quizCode });
-
     if (quiz) {
       return res.status(200).json({ exists: true });
     } else {
@@ -75,21 +170,21 @@ app.get('/quiz/:code', async (req, res) => {
   }
 });
 
-// yaha pe questions fetch kr rha hu quiz wale page pe
+// Fetch Questions of a Quiz
 app.get('/api/quizzes/:code', async (req, res) => {
   const { code } = req.params;
   try {
     const quiz = await Quiz.findOne({ code: code });
-    if (!quiz) return res.status(404).json({ message: "Quiz not found" });
+    if (!quiz) {
+      return res.status(404).json({ message: 'Quiz not found' });
+    }
     res.status(200).json(quiz);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-
-
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}/createquiz`);
+  console.log(`Server is running on http://localhost:${port}`);
 });

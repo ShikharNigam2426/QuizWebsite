@@ -1,15 +1,64 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 import styled from "styled-components";
 
 const SignUp = () => {
+    // State to hold email and password
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    // Handle form submission
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(""); // Reset any previous error
+
+        try {
+            const response = await axios.post("http://localhost:3003/register", {
+                email,
+                password,
+            });
+
+            console.log("Signup successful:", response.data);
+            // Redirect to login page after successful signup
+            window.location.href = "/login";
+        } catch (err) {
+            setLoading(false);
+            if (err.response) {
+                // Server error
+                setError(err.response.data.message || "Signup failed");
+            } else {
+                // Network error
+                setError("Network error. Please try again later.");
+            }
+        }
+    };
+
     return (
         <SignupContainer>
             <SignupBox>
                 <h1>Sign Up</h1>
-                <form>
-                    <Input type="text" placeholder="Email" />
-                    <Input type="password" placeholder="Password" />
-                    <SignupButton type="submit">Sign Up</SignupButton>
+                <form onSubmit={handleSubmit}>
+                    <Input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                    <Input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                    <SignupButton type="submit" disabled={loading}>
+                        {loading ? "Signing up..." : "Sign Up"}
+                    </SignupButton>
+                    {error && <ErrorMessage>{error}</ErrorMessage>}
                 </form>
                 <Text>
                     Already have an account? <Link href="/login">Login</Link>
@@ -52,7 +101,7 @@ const Input = styled.input`
 
     &:focus {
         outline: none;
-        border-color: #007bff; 
+        border-color: #007bff;
         box-shadow: 0 0 5px #007bff;
     }
 `;
@@ -72,6 +121,17 @@ const SignupButton = styled.button`
     &:hover {
         background-color: #0056b3;
     }
+
+    &:disabled {
+        background-color: #aaa;
+        cursor: not-allowed;
+    }
+`;
+
+const ErrorMessage = styled.div`
+    color: red;
+    margin-top: 10px;
+    font-size: 0.9rem;
 `;
 
 const Text = styled.p`

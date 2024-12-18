@@ -143,6 +143,10 @@ const QuizContainer = styled.div`
   border-radius: 10px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4);
   text-align: center;
+
+  @media (max-width: 600px) {
+    width: 90%;
+  }
 `;
 
 const Timer = styled.div`
