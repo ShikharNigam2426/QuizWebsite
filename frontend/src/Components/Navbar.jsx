@@ -1,8 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { setUserEmail } from '../redux/userSlice';
+import { useSelector, useDispatch } from 'react-redux';
 
 const Navbar = () => {
+
+  const dispatch = useDispatch();
+  const currentUser = useSelector((state) => state.user.email);
+
+  const handleLogout = () => {
+    dispatch(setUserEmail(""));
+  }
+
   return (
     <NavbarComponent>
       <LeftSection>
@@ -10,10 +20,17 @@ const Navbar = () => {
           <h1 className='logo'>Brain <span>Rush</span></h1>
         </StyledLink>
       </LeftSection>
-      <RightSection>
-        <Link to='/login'><Button className='btn btn-outline-primary'>Login</Button></Link>
-        <Link to='/signup'><Button className='btn btn-primary'>Register</Button></Link>
-      </RightSection>
+      {
+        (currentUser === "") ? <RightSection>
+          <Link to='/login'><Button className='btn btn-outline-primary'>Login</Button></Link>
+          <Link to='/signup'><Button className='btn btn-primary'>Register</Button></Link>
+        </RightSection> : 
+        <RightSection>
+          <Button className='btn bg-danger btn-outline-danger' style={{'border': '1px solid red'}} onClick={() => {handleLogout()}}>Logout</Button>
+        </RightSection>
+      }
+      {/* <RightSection>
+      </RightSection> */}
     </NavbarComponent>
   );
 };
@@ -23,7 +40,7 @@ export default Navbar;
 const NavbarComponent = styled.div`
   width: 100%;
   padding: 20px 40px;
-  background: black;
+  background: transparent;
   display: flex;
   justify-content: space-between;
   align-items: center;

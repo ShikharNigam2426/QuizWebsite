@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const Quiz = () => {
   const { code } = useParams(); // Get the quiz code from the URL params
@@ -15,12 +16,13 @@ const Quiz = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [oneTimeFetch, setOneTimeFetch] = useState(true);
+  const [showLeaderboard, setShowLeaderboard] = useState(false); // State for toggling leaderboard view
+
+  const userEmail = useSelector((state) => state.user.email)
 
   // Fetch questions from the API
   useEffect(() => {
     const fetchQuestions = async () => {
-      console.log('fetching');
-      
       try {
         const response = await axios.get(`http://localhost:3003/api/quizzes/${code}`);
         setQuestions(response.data.questions);
@@ -63,12 +65,31 @@ const Quiz = () => {
         setTimer(10);
       } else {
         setShowResults(true);
+        // Immediately submit the results when the quiz finishes
+        submitResults();
       }
     }
   };
 
   const handleOptionSelect = (option) => {
     setSelectedAnswer(option);
+  };
+
+  // Submit results to backend when quiz finishes
+  const submitResults = async () => {
+    try {
+      await axios.post('http://localhost:3003/api/submit-quiz-result', {
+        email: userEmail, // Replace with the user's email
+        score: score,
+        quizCode: code
+      });
+    } catch (error) {
+      console.error('Error saving result:', error);
+    }
+  };
+
+  const toggleLeaderboard = () => {
+    setShowLeaderboard((prev) => !prev);
   };
 
   if (loading) {
@@ -101,38 +122,90 @@ const Quiz = () => {
           </NextButton>
         </>
       ) : (
-        <ResultContainer>
-          <h2>Quiz Results</h2>
-          <Score>
-            <strong>Score: </strong>{score} / {questions.length}
-          </Score>
-          {answers.map((ans, index) => {
-            const isCorrect = ans.answer === questions[index]?.correctAnswer;
-            return (
-              <p key={index}>
-                <strong>Q:</strong> {ans.question} <br />
-                <strong>Your Answer:</strong> {ans.answer}{" "}
-                {isCorrect ? (
-                  <TickIcon>&#10003;</TickIcon>
-                ) : (
-                  <>
-                    <CrossIcon>&#10007;</CrossIcon>
-                    <br />
-                    <strong>Correct Answer:</strong> {questions[index]?.correctAnswer}
-                  </>
-                )}
-              </p>
-            );
-          })}
-        </ResultContainer>
+        <>
+          <ResultContainer>
+            <h2>Quiz Results</h2>
+            <Score>
+              <strong>Score: </strong>{score} / {questions.length}
+            </Score>
+            {answers.map((ans, index) => {
+              const isCorrect = ans.answer === questions[index]?.correctAnswer;
+              return (
+                <p key={index}>
+                  <strong>Q:</strong> {ans.question} <br />
+                  <strong>Your Answer:</strong> {ans.answer}{" "}
+                  {isCorrect ? (
+                    <TickIcon>&#10003;</TickIcon>
+                  ) : (
+                    <>
+                      <CrossIcon>&#10007;</CrossIcon>
+                      <br />
+                      <strong>Correct Answer:</strong> {questions[index]?.correctAnswer}
+                    </>
+                  )}
+                </p>
+              );
+            })}
+          </ResultContainer>
+          <LeaderboardButton onClick={toggleLeaderboard} className="ml-1 btn-primary">
+            {showLeaderboard ? "Hide Leaderboards" : "View Leaderboards"}
+          </LeaderboardButton>
+        </>
       )}
+
+      {showLeaderboard && <Leaderboard code={code} />}
     </QuizContainer>
   );
 };
 
-export default Quiz;
+const Leaderboard = ({ code }) => {
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-// Styled Components
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3003/api/leaderboard/${code}`);
+        setLeaderboard(response.data.leaderboard);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to load leaderboard. Please try again later.");
+        setLoading(false);
+      }
+    };
+
+    fetchLeaderboard();
+  }, [code]);
+
+  if (loading) {
+    return <LeaderboardContainer>Loading leaderboard...</LeaderboardContainer>;
+  }
+
+  if (error) {
+    return <LeaderboardContainer>{error}</LeaderboardContainer>;
+  }
+
+  return (
+    <LeaderboardContainer>
+      <h2>Leaderboard</h2>
+      <LeaderboardList>
+        {leaderboard.length > 0 ? (
+          leaderboard.map((user, index) => (
+            <LeaderboardItem key={index}>
+              <Rank>{index + 1}</Rank>
+              <Username>{user.email}</Username>
+              <Score>{user.score} points</Score>
+            </LeaderboardItem>
+          ))
+        ) : (
+          <p>No results available yet.</p>
+        )}
+      </LeaderboardList>
+    </LeaderboardContainer>
+  );
+};
+
 const QuizContainer = styled.div`
   background-color: #0f172a;
   color: #e2e8f0;
@@ -210,10 +283,60 @@ const ResultContainer = styled.div`
   }
 `;
 
-const Score = styled.div`
-  font-size: 1.2rem;
+const LeaderboardButton = styled.button`
+  background-color: #007bff;
   color: #fff;
-  margin-bottom: 20px;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+
+const LeaderboardContainer = styled.div`
+  background-color: #0f172a;
+  color: #e2e8f0;
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4);
+`;
+
+const LeaderboardList = styled.div`
+  margin-top: 20px;
+  text-align: left;
+`;
+
+const LeaderboardItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  background-color: #1e293b;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+`;
+
+const Rank = styled.div`
+  width: 30px;
+  text-align: center;
+  font-size: 1.2rem;
+`;
+
+const Username = styled.div`
+  flex: 1;
+  text-align: left;
+  font-size: 1rem;
+`;
+
+const Score = styled.div`
+  font-size: 1rem;
+  font-weight: bold;
+  color: #4dabf7;
 `;
 
 const TickIcon = styled.span`
@@ -227,3 +350,5 @@ const CrossIcon = styled.span`
   margin-left: 10px;
   font-size: 1.5rem;
 `;
+
+export default Quiz;

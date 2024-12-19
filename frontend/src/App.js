@@ -11,39 +11,56 @@ import TakeQuiz from './Components/TakeQuiz';
 const App = () => {
   return (
     <AppComponent>
-      <Router>
-        <Routes>
-          <Route path="/" element={
-            <>
-              <Navbar />
-              <Landing />
-            </>
-          } />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/createQuiz" element={
-            <>
-              <Navbar />
-              <CreatePage />
-            </>
-          } />
-          <Route path="/takeQuiz/:code" element={
-            <>
-              <Navbar />
-              <TakeQuiz />
-            </>
-          } />
-        </Routes>
-      </Router>
+        <Router>
+          <Routes>
+            <Route path="/" element={
+              <>
+                <Navbar />
+                <Landing />
+              </>
+            } />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/createQuiz" element={
+              <>
+                <Navbar />
+                <CreatePage />
+              </>
+            } />
+            <Route path="/takeQuiz/:code" element={
+              <>
+                <Navbar />
+                <TakeQuiz />
+              </>
+            } />
+          </Routes>
+        </Router>
     </AppComponent>
   );
 };
 
 const AppComponent = styled.div`
-  background-color: black;
+  position: relative;
   height: 100vh;
   width: 100vw;
   overflow-x: hidden;
+  
+  background: url('./bg.jpeg');
+  background-size: cover;
+  background-position: center;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    filter: brightness(50%); /* Darkens only the background */
+    z-index: -1;
+  }
 `;
+
 
 export default App;

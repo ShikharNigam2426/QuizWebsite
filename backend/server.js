@@ -5,6 +5,7 @@ import nodemailer from 'nodemailer';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import Quiz from './Models/Quiz.js';
+import Result from './Models/Results.js';  // Import Results model
 
 dotenv.config();
 
@@ -182,6 +183,42 @@ app.get('/api/quizzes/:code', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Store Quiz Result and Update Leaderboard
+app.post('/api/submit-quiz-result', async (req, res) => {
+  const { email, score, quizCode } = req.body;
+  try {
+    const result = new Result({
+      email,
+      score,
+      quizCode,
+    });
+    await result.save();
+    res.status(201).json({ message: 'Result saved successfully' });
+  } catch (error) {
+    console.error('Error saving result:', error);
+    res.status(500).json({ message: 'Error saving result' });
+  }
+});
+
+// Fetch Leaderboard for a Quiz
+app.get('/api/leaderboard/:quizCode', async (req, res) => {
+  const { quizCode } = req.params;
+  try {
+    const results = await Result.find({ quizCode })
+      .sort({ score: -1 })  // Sort by score in descending order
+      .limit(10);  // Get top 10 scores
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No results found for this quiz' });
+    }
+
+    res.status(200).json({ leaderboard: results });
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
+    res.status(500).json({ message: 'Error fetching leaderboard' });
   }
 });
 

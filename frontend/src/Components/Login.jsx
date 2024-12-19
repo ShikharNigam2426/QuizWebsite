@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux"; // Import useDispatch from Redux
+import { setUserEmail } from "../redux/userSlice"; // Import the Redux action
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -9,41 +11,34 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-  
-  // Use navigate from react-router-dom
-  const navigate = useNavigate();
 
-  // Function to handle OTP login
+  const navigate = useNavigate();
+  const dispatch = useDispatch(); // Initialize Redux dispatcher
+
   const handleOTPLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(""); // Reset error
+    setError("");
 
     try {
       if (!otpSent) {
-        // Send email to backend to send OTP
+        // Send email to request OTP
         const response = await axios.post("http://localhost:3003/login", { email });
         if (response.status === 200) {
-          setOtpSent(true); // OTP sent successfully
-          setLoading(false);
+          setOtpSent(true);
         }
       } else {
-        // Verify OTP when the user submits it
+        // Verify OTP
         const response = await axios.post("http://localhost:3003/verify-otp", { email, otp });
         if (response.status === 200) {
-          console.log("OTP verified successfully");
-          // Redirect to dashboard or home page after successful verification
-          navigate("/"); // Using navigate to route to /dashboard
+          dispatch(setUserEmail(email)); // Update Redux state with email
+          navigate("/"); // Redirect to dashboard
         }
-        setLoading(false);
       }
     } catch (err) {
+      setError(err.response?.data?.message || "An error occurred. Please try again.");
+    } finally {
       setLoading(false);
-      if (err.response) {
-        setError(err.response.data.message || "Error occurred");
-      } else {
-        setError("Network error. Please try again later.");
-      }
     }
   };
 
@@ -68,10 +63,7 @@ const Login = () => {
                 onChange={(e) => setOtp(e.target.value)}
                 required
               />
-              <LoginButton
-                type="submit"
-                disabled={otp.length !== 6 || loading}
-              >
+              <LoginButton type="submit" disabled={otp.length !== 6 || loading}>
                 {loading ? "Verifying..." : "Verify OTP"}
               </LoginButton>
             </>

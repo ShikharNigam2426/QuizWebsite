@@ -91,7 +91,7 @@ const ErrorMessage = styled.p`
 const LandingComponent = styled.div`
   width: 100%;
   height: 100vh;
-  background: #000000;
+  background: transparent;
   display: flex;
   justify-content: center;
   padding: 20px;
