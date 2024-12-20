@@ -72,14 +72,14 @@ const SignUp = () => {
 const SignupContainer = styled.div`
     height: 100vh;
     width: 100%;
-    background-color: #121212;
+    background-color: transparent;
     display: flex;
     justify-content: center;
     align-items: center;
 `;
 
 const SignupBox = styled.div`
-    background-color: #1e1e1e;
+    background-color: #1e1e1e5d;
     color: #ffffff;
     padding: 2rem;
     border-radius: 10px;
@@ -90,7 +90,7 @@ const SignupBox = styled.div`
 `;
 
 const Input = styled.input`
-    background-color: #292929;
+    background-color: #2929297a;
     color: #fff;
     border: 1px solid #444;
     padding: 10px;

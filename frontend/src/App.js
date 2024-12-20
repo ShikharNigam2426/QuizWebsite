@@ -11,30 +11,38 @@ import TakeQuiz from './Components/TakeQuiz';
 const App = () => {
   return (
     <AppComponent>
-        <Router>
-          <Routes>
-            <Route path="/" element={
-              <>
-                <Navbar />
-                <Landing />
-              </>
-            } />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/createQuiz" element={
-              <>
-                <Navbar />
-                <CreatePage />
-              </>
-            } />
-            <Route path="/takeQuiz/:code" element={
-              <>
-                <Navbar />
-                <TakeQuiz />
-              </>
-            } />
-          </Routes>
-        </Router>
+      <Router>
+        <Routes>
+          <Route path="/" element={
+            <div className='space'>
+              <Navbar />
+              <Landing />
+            </div>
+          } />
+          <Route path="/signup" element={
+            <div className='space'>
+              <SignUp />
+            </div>
+          } />
+          <Route path="/login" element={
+            <div className='space'>
+              <Login />
+            </div>
+          } />
+          <Route path="/createQuiz" element={
+            <div className='space'>
+              <Navbar />
+              <CreatePage />
+            </div>
+          } />
+          <Route path="/takeQuiz/:code" element={
+            <div>
+              <Navbar />
+              <TakeQuiz />
+            </div>
+          } />
+        </Routes>
+      </Router>
     </AppComponent>
   );
 };
@@ -44,8 +52,7 @@ const AppComponent = styled.div`
   height: 100vh;
   width: 100vw;
   overflow-x: hidden;
-  
-  background: url('./bg.jpeg');
+  background-color: black;
   background-size: cover;
   background-position: center;
 
@@ -60,6 +67,13 @@ const AppComponent = styled.div`
     filter: brightness(50%); /* Darkens only the background */
     z-index: -1;
   }
+
+  .space{
+    background: url('./bg.jpeg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+  }
+
 `;
 
 

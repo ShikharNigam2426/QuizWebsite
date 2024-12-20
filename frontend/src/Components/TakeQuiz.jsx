@@ -17,8 +17,9 @@ const Quiz = () => {
   const [error, setError] = useState("");
   const [oneTimeFetch, setOneTimeFetch] = useState(true);
   const [showLeaderboard, setShowLeaderboard] = useState(false); // State for toggling leaderboard view
+  const [resultsSubmitted, setResultsSubmitted] = useState(false); // Track if results are submitted
 
-  const userEmail = useSelector((state) => state.user.email)
+  const userEmail = useSelector((state) => state.user.email);
 
   // Fetch questions from the API
   useEffect(() => {
@@ -56,7 +57,7 @@ const Quiz = () => {
 
       // Update score if correct answer is selected
       if (selectedAnswer === questions[currentQuestionIndex].correctAnswer) {
-        setScore((prev) => prev + 1);
+        setScore((prev) => prev + 1); // Increment score for correct answer
       }
 
       setSelectedAnswer("");
@@ -65,8 +66,10 @@ const Quiz = () => {
         setTimer(10);
       } else {
         setShowResults(true);
-        // Immediately submit the results when the quiz finishes
-        submitResults();
+        if (!resultsSubmitted) {
+          // Submit results when quiz finishes and only if not submitted already
+          submitResults();
+        }
       }
     }
   };
@@ -83,6 +86,7 @@ const Quiz = () => {
         score: score,
         quizCode: code
       });
+      setResultsSubmitted(true); // Set resultsSubmitted to true after submitting
     } catch (error) {
       console.error('Error saving result:', error);
     }
@@ -111,7 +115,7 @@ const Quiz = () => {
               <Option
                 key={index}
                 onClick={() => handleOptionSelect(option)}
-                isSelected={selectedAnswer === option}
+                $isSelected={selectedAnswer === option}
               >
                 {option}
               </Option>

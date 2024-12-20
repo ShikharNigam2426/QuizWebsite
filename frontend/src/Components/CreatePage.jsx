@@ -220,7 +220,7 @@ const PageContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background-color: black;
+  background-color: transparent;
   color: #fff;
 `;
 
@@ -262,7 +262,7 @@ const ScrollableQuestions = styled.div`
 `;
 
 const QuestionItem = styled.div`
-  background-color: rgba(10, 20, 40, 0.9);
+  background-color: #0a1428c3;
   padding: 15px;
   margin-bottom: 10px;
   border-radius: 8px;
@@ -335,7 +335,7 @@ const CreateQuizButton = styled.button`
 
 const FormContainer = styled.div`
   width: 100%;
-  background-color: rgba(10, 20, 40, 0.9);
+  background-color: #0a1428c3;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
