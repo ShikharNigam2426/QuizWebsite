@@ -1,11 +1,10 @@
 # Quiz Website
 
-A fully responsive and interactive quiz website that allows users to test their knowledge on various topics. Built using modern web technologies for a smooth and engaging experience.
+A fully responsive and interactive quiz website that allows users to create and give quizes and compete for the top positions in the leaderboard. Built using modern web technologies for a smooth and engaging experience.
 
 ## Features
 
-- **User Authentication**: Sign up, log in, and manage user profiles.
-- **Dynamic Quizzes**: Randomly generated questions based on selected topics.
+- **User Authentication**: Sign up, log in using OTP.
 - **Leaderboard**: Track and display top performers.
 - **Responsive Design**: Works seamlessly on all devices.
 
